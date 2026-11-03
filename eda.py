@@ -9,7 +9,7 @@ import seaborn as sns
 
 
 @st.cache_data
-def load_dataset(dataset_path='../dataset'):
+def load_dataset(dataset_path='./dataset'):
     '''
     Memuat filepath gambar dan mengekstrak metadata dimensi serta color channel.
     '''

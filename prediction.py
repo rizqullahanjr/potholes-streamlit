@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Load Model & Mapping Kelas
-model_path = '../best_pothole_model.keras'
+model_path = 'best_pothole_model.keras'
 best_pothole_model = load_model(model_path, compile=False)
 class_names = {0: 'normal', 1: 'potholes'}
 
