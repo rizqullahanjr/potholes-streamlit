@@ -7,17 +7,6 @@ from PIL import Image
 import tensorflow as tf
 from tensorflow.keras.models import load_model # type: ignore
 
-@st.cache_resource
-def load_pothole_model():
-    """
-    Memuat model CNN terbaik dengan path absolut langsung (saklek)
-    mengikuti posisi file prediction.py berada, ditambah compile=False
-    agar tidak error pada optimizer/state training saat inferensi.
-    """
-
-    model = load_model('best_pothole_model.keras', compile=False)
-    return model
-
 def run():
     '''
     Fungsi untuk menjalankan halaman prediksi citra kondisi jalan raya.
@@ -26,7 +15,7 @@ def run():
     st.title('Pothole Road Damage Detection')
     st.subheader('Formulir Unggah Citra Jalan & Prediksi Klasifikasi CNN')
 
-    model = load_pothole_model()
+    model = load_model('best_pothole_model.keras', compile=False)
 
     with st.form(key='pothole_prediction_form'):
         pelapor = st.text_input('Nama Petugas / Pelapor', value='Tim Inspeksi Lapangan')
