@@ -14,26 +14,9 @@ def load_pothole_model():
     mengikuti posisi file prediction.py berada, ditambah compile=False
     agar tidak error pada optimizer/state training saat inferensi.
     """
-    # Mengunci path langsung ke folder tempat prediction.py berada
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(base_dir, 'best_pothole_model.keras')
 
-    # Fallback pencarian sekunder jika file dipanggil dari root berbeda
-    if not os.path.exists(model_path):
-        fallback_path = os.path.abspath('best_pothole_model.keras')
-        if os.path.exists(fallback_path):
-            model_path = fallback_path
-
-    if not os.path.exists(model_path):
-        return None, f"File model tidak ditemukan di: {model_path}"
-
-    try:
-        # compile=False wajib digunakan saat inferensi agar terhindar dari
-        # konflik konfigurasi optimizer/loss antar versi Keras dan TensorFlow
-        model = load_model(model_path, compile=False)
-        return model, None
-    except Exception as e:
-        return None, str(e)
+    model = load_model('best_pothole_model.keras', compile=False)
+    return model
 
 def run():
     '''
@@ -43,7 +26,7 @@ def run():
     st.title('Pothole Road Damage Detection')
     st.subheader('Formulir Unggah Citra Jalan & Prediksi Klasifikasi CNN')
 
-    model, class_names = load_pothole_model()
+    model = load_pothole_model()
 
     with st.form(key='pothole_prediction_form'):
         pelapor = st.text_input('Nama Petugas / Pelapor', value='Tim Inspeksi Lapangan')
@@ -94,7 +77,7 @@ def run():
         pred_binary = 1 if prob_pothole >= 0.5 else 0
 
         # Mengubah kembali hasil prediksi numerik (0 / 1) menjadi label string asli ('normal' / 'potholes')
-        pred_label_str = class_names.get(str(pred_binary), 'potholes' if pred_binary == 1 else 'normal')
+        pred_label_str = 'potholes' if pred_binary == 1 else 'normal'
         confidence_pct = (prob_pothole if pred_binary == 1 else (1.0 - prob_pothole)) * 100.0
 
         with col2:
