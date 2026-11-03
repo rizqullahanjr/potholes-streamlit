@@ -9,27 +9,31 @@ from tensorflow.keras.models import load_model # type: ignore
 
 @st.cache_resource
 def load_pothole_model():
-    '''
-    Memuat model CNN terbaik dan mapping label string kelas.
-    '''
-    possible_paths = [
-        'best_pothole_model.keras',
-        '../best_pothole_model.keras'
-    ]
-    model = None
-    for path in possible_paths:
-        if os.path.exists(path):
-            model = load_model(path)
-            break
+    """
+    Memuat model CNN terbaik dengan path absolut langsung (saklek)
+    mengikuti posisi file prediction.py berada, ditambah compile=False
+    agar tidak error pada optimizer/state training saat inferensi.
+    """
+    # Mengunci path langsung ke folder tempat prediction.py berada
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, 'best_pothole_model.keras')
 
-    class_names = {'0': 'normal', '1': 'potholes'}
-    for cpath in ['class_names.json', '../class_names.json']:
-        if os.path.exists(cpath):
-            with open(cpath, 'r') as f:
-                class_names = json.load(f)
-            break
+    # Fallback pencarian sekunder jika file dipanggil dari root berbeda
+    if not os.path.exists(model_path):
+        fallback_path = os.path.abspath('best_pothole_model.keras')
+        if os.path.exists(fallback_path):
+            model_path = fallback_path
 
-    return model, class_names
+    if not os.path.exists(model_path):
+        return None, f"File model tidak ditemukan di: {model_path}"
+
+    try:
+        # compile=False wajib digunakan saat inferensi agar terhindar dari
+        # konflik konfigurasi optimizer/loss antar versi Keras dan TensorFlow
+        model = load_model(model_path, compile=False)
+        return model, None
+    except Exception as e:
+        return None, str(e)
 
 def run():
     '''
